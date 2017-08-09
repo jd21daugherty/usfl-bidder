@@ -1,13 +1,14 @@
 
-module.exports = function Player(FirstName, LastName, Team, Best, Worst, Avg, StdDev){
-    this._FirstName = FirstName,
-    this._LastName = LastName,
-    this._Team = Team,
-    this._Best = Best,
-    this._Worst = Worst,
-    this._Avg = Avg,
-    this._StdDev = StdDev
-  
+module.exports = function Player(FirstName, LastName, Team, Best, Worst, Avg, StdDev, Divisor, Value){
+    this.FirstName = FirstName,
+    this.LastName = LastName,
+    this.Team = Team,
+    this.Best = Best,
+    this.Worst = Worst,
+    this.Avg = Avg,
+    this.StdDev = StdDev,
+    this.Divisor = Divisor,
+    this.Value = Value
   // methods
 
 }
