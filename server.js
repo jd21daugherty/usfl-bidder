@@ -55,7 +55,7 @@ router.route('/playervalues/wr')
   request('https://www.fantasypros.com/nfl/rankings/dynasty-wr.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
-    var wrs = createPlayerObjects(body);
+    var wrs = createPlayerObjects(body, "wr");
     res.json(wrs);
   });
 });
@@ -151,14 +151,16 @@ function createPlayerObjects(body, position){
 
     var divisor;
 
+    var avgRank = storePlayerValues[2];
+
     if (position = "qb"){
-      divisor = getQbDivisor(storePlayerValues[2]);
+      divisor = getQbDivisor(avgRank);
     }
     else if (position = "rb"){
 
     }
     else if (position = "wr"){
-
+      divisor = getWrDivisor(avgRank);
     }
     else if (position = "te"){
 
@@ -210,6 +212,30 @@ function getQbDivisor(avgRank){
   }
   else {
     divisor = divisor + 7
+  }
+
+  return divisor;
+}
+
+function getWrDivisor(avgRank){
+  var divisor = 0;
+  if (avgRank <= 20){
+    divisor = divisor + 4
+  }
+  else if (avgRank > 20 && avgRank <= 40){
+    divisor = divisor + 4.05
+  }
+  else if (avgRank > 40 && avgRank <= 60) {
+    divisor = divisor + 4.1
+  }
+  else if (avgRank > 60 && avgRank <= 75){
+    divisor = divisor + 4.25
+  }
+  else if (avgRank > 75 && avgRank <= 100){
+    divisor = divisor + 4.35
+  }
+  else {
+    divisor = divisor + 4.5
   }
 
   return divisor;
