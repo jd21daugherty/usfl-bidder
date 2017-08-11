@@ -44,14 +44,13 @@ router.route('/playervalues/rb')
   request('https://www.fantasypros.com/nfl/rankings/dynasty-rb.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
-    var rbs = createPlayerObjects(body);
+    var rbs = createPlayerObjects(body, "rb");
     res.json(rbs);
   });
 });
 
 router.route('/playervalues/wr')
 .get(function(req, res){
-
   request('https://www.fantasypros.com/nfl/rankings/dynasty-wr.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
@@ -153,36 +152,45 @@ function createPlayerObjects(body, position){
 
     var avgRank = storePlayerValues[2];
 
-    if (position = "qb"){
+    if (position === "qb"){
       divisor = getQbDivisor(avgRank);
     }
-    else if (position = "rb"){
-
+    else if (position === "rb"){
+      divisor = getRbDivisor(avgRank);
     }
-    else if (position = "wr"){
+    else if (position === "wr"){
       divisor = getWrDivisor(avgRank);
     }
-    else if (position = "te"){
+    else if (position === "te"){
 
     }
-    else if (position = "k"){
+    else if (position === "k"){
 
     }
-    else if (position = "dst"){
+    else if (position === "dst"){
 
     }
 
-    var value = calculatePlayerValue(divisor, storePlayerValues[1]);
+    var firstName = splitPlayerNameArr[0];
+    var lastName = splitPlayerNameArr[1];
+    var team = splitPlayerNameArr[2];
+
+    var bestRank = storePlayerValues[0];
+    var worstRank = storePlayerValues[1];
+
+    var stdDev = storePlayerValues[3];
+
+    var value = calculatePlayerValue(divisor, bestRank, worstRank);
 
     //FirstName, LastName, Team, Best, Worst, Avg, StdDev, divisor, value
     var createdPlayer = new Player(
-      splitPlayerNameArr[0],
-      splitPlayerNameArr[1],
-      splitPlayerNameArr[2],
-      storePlayerValues[0],
-      storePlayerValues[1],
-      storePlayerValues[2],
-      storePlayerValues[3],
+      firstName,
+      lastName,
+      team,
+      bestRank,
+      worstRank,
+      avgRank,
+      stdDev,
       divisor,
       value
     );
@@ -195,8 +203,8 @@ function createPlayerObjects(body, position){
     return playerArr;
   }
 
-function calculatePlayerValue(divisor, worstRank){
-  return playerValue = Math.floor(((100 - worstRank) * 2) / divisor);
+function calculatePlayerValue(divisor, bestRank, worstRank){
+  return playerValue = Math.floor(((100 - bestRank) + (100 - worstRank)) / divisor);
 }
 
 function getQbDivisor(avgRank){
@@ -217,25 +225,45 @@ function getQbDivisor(avgRank){
   return divisor;
 }
 
-function getWrDivisor(avgRank){
+function getRbDivisor(avgRank){
   var divisor = 0;
-  if (avgRank <= 20){
+  if (avgRank <= 10){
     divisor = divisor + 4
   }
-  else if (avgRank > 20 && avgRank <= 40){
-    divisor = divisor + 4.05
+  else if(avgRank > 10 && avgRank <= 20){
+    divisor = divisor + 4.5
   }
-  else if (avgRank > 40 && avgRank <= 60) {
-    divisor = divisor + 4.1
+  else if(avgRank > 20 && avgRank <= 25){
+    divisor = divisor + 5
   }
-  else if (avgRank > 60 && avgRank <= 75){
-    divisor = divisor + 4.25
+  else if(avgRank > 25 && avgRank <= 40){
+    divisor = divisor + 5.5
+  }
+  else{
+    divisor = divisor + 6
+  }
+  return divisor;
+}
+
+function getWrDivisor(avgRank){
+  var divisor = 0;
+  if (avgRank <= 15){
+    divisor = divisor + 4
+  }
+  else if (avgRank > 15 && avgRank <= 30){
+    divisor = divisor + 4.5
+  }
+  else if (avgRank > 30 && avgRank <= 50) {
+    divisor = divisor + 4.75
+  }
+  else if (avgRank > 50 && avgRank <= 75){
+    divisor = divisor + 5
   }
   else if (avgRank > 75 && avgRank <= 100){
-    divisor = divisor + 4.35
+    divisor = divisor + 5.25
   }
   else {
-    divisor = divisor + 4.5
+    divisor = divisor + 5.5
   }
 
   return divisor;
