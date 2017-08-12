@@ -65,7 +65,7 @@ router.route('/playervalues/te')
   request('https://www.fantasypros.com/nfl/rankings/dynasty-te.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
-    var tes = createPlayerObjects(body);
+    var tes = createPlayerObjects(body, "te");
     res.json(tes);
   });
 });
@@ -92,16 +92,6 @@ router.route('/playervalues/dst')
   });
 });
 
-router.route('/playervalues/overall')
-.get(function(req, res){
-
-  request('https://www.fantasypros.com/nfl/rankings/dynasty-overall.php', function(error, response, body){
-    console.log('Errors: ' + error);
-    // call out to return from create player objects function
-    var overall = createPlayerObjects(body);
-    res.json(overall);
-  });
-});
 
 function createPlayerObjects(body, position){
 
@@ -162,7 +152,7 @@ function createPlayerObjects(body, position){
       divisor = getWrDivisor(avgRank);
     }
     else if (position === "te"){
-
+      divisor = getTeDivisor(avgRank);
     }
     else if (position === "k"){
 
@@ -269,6 +259,22 @@ function getWrDivisor(avgRank){
   return divisor;
 }
 
+function getTeDivisor(avgRank){
+  var divisor = 0;
+  if (avgRank <= 2){
+    divisor = divisor + 4
+  }
+  else if(avgRank > 2 && avgRank <= 5){
+    divisor = divisor + 4.5
+  }
+  else if(avgRank > 5 && avgRank <= 10){
+    divisor = divisor + 5
+  }
+  else{
+    divisor = divisor + 6
+  }
+  return divisor;
+}
 
 // Express App Initialization
 app.use('/api', router);
