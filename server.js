@@ -19,12 +19,12 @@ var router = express.Router();
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging
-    console.log('Something is happening.');
+    console.log('Middleware is working!.');
     next(); // make sure we go to the next routes and don't stop here
 });
 
 router.get('/', function(req, res) {
-    res.json({ message: 'hooray! welcome to our api!' });
+    res.json({ message: 'hooray! welcome to the USFL api!' });
 });
 
 // routes for obtaining player values
@@ -67,28 +67,6 @@ router.route('/playervalues/te')
     // call out to return from create player objects function
     var tes = createPlayerObjects(body, "te");
     res.json(tes);
-  });
-});
-
-router.route('/playervalues/k')
-.get(function(req, res){
-
-  request('https://www.fantasypros.com/nfl/rankings/dynasty-k.php', function(error, response, body){
-    console.log('Errors: ' + error);
-    // call out to return from create player objects function
-    var k = createPlayerObjects(body);
-    res.json(k);
-  });
-});
-
-router.route('/playervalues/dst')
-.get(function(req, res){
-
-  request('https://www.fantasypros.com/nfl/rankings/dynasty-dst.php', function(error, response, body){
-    console.log('Errors: ' + error);
-    // call out to return from create player objects function
-    var dst = createPlayerObjects(body);
-    res.json(dst);
   });
 });
 
@@ -154,12 +132,7 @@ function createPlayerObjects(body, position){
     else if (position === "te"){
       divisor = getTeDivisor(avgRank);
     }
-    else if (position === "k"){
 
-    }
-    else if (position === "dst"){
-
-    }
 
     var firstName = splitPlayerNameArr[0];
     var lastName = splitPlayerNameArr[1];
@@ -187,7 +160,7 @@ function createPlayerObjects(body, position){
 
     playerArr.push(createdPlayer);
 
-    console.log(createdPlayer);
+    //console.log(createdPlayer);
 
    }
     return playerArr;
@@ -280,4 +253,4 @@ function getTeDivisor(avgRank){
 app.use('/api', router);
 
 app.listen(port);
-console.log('Magic happens on port ' + port);
+console.log('Welcome to the USFL API on port: ' + port);
