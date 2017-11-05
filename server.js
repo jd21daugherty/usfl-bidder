@@ -26,7 +26,7 @@ admin.initializeApp({
 
 var db = admin.firestore();
 
-var qbDocRef = db.collection('values').doc('qb');
+
 var rbDocRef = db.collection('values').doc('rb');
 var wrDocRef = db.collection('values').doc('wr');
 var teDocRef = db.collection('values').doc('te');
@@ -58,23 +58,26 @@ router.route('/playervalues/qb')
   request('https://www.fantasypros.com/nfl/rankings/dynasty-qb.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
-    var qbs = createPlayerObjects(body, "qb");
+    var qbs = createPlayerObjects(body, "qb");  
+    var date = new Date().toJSON().slice(0,10).replace(/-/g,'/');  
+
     //save only the top 25 qbs
-    for(var i=0; i<25; i++){
-      console.log(qbs[i]);
-      var set = qbDocRef.set({
-        firstname: qbs[i].FirstName,
-        lastname: qbs[i].LastName,
-        team: qbs[i].Team,
+    for(var i = 0; i < 24; i++){
+      var qbDocRef = db.collection('qb-values').doc(qbs[i].FirstName + " " + qbs[i].LastName);
+      var timevalue = {
+        timestamp: date,
+        value: qbs[i].Value,
         best: qbs[i].Best,
         worst: qbs[i].Worst,
         avg: qbs[i].Avg,
         stddev: qbs[i].StdDev,
-        divisor: qbs[i].Divisor,
-        value: qbs[i].Value
-      });
-      res.json(qbs);
+        divisor: qbs[i].Divisor,    
+      }
+      
+      createOrUpdateDocument(qbDocRef, qbs[i].FirstName, qbs[i].LastName, qbs[i].Team, timevalue);
+
     };
+    res.json(qbs);
   });
 });
 
@@ -122,6 +125,31 @@ router.route('/playervalues/te')
 
 // API Private Functions
 
+function createOrUpdateDocument(docRef, playerfirstname, playerlastname, team, timevalue) {
+  var getDoc = docRef.get()
+  .then(doc => {
+      if (!doc.exists) {
+          console.log('Creating document for : ' + playerfirstname + " " + playerlastname );
+          qbDocRef.set({
+            firstname: playerfirstname,
+            lastname: playerlastname,
+            team: team,
+            values: [timevalue]
+          });
+      } else {
+          console.log('Updating document for :' + playerfirstname + " " + playerlastname);
+          var newValueArr = Object.assign({}, doc.data().values)
+          newValueArr.push(timevalue);
+          qbDocRef.update({
+            values: newValueArr
+          });
+      }
+  })
+  .catch(err => {
+      console.log('Error getting document', err);
+  });
+}
+
 function createPlayerObjects(body, position){
 
   const $ = cheerio.load(body.toString());
@@ -148,7 +176,7 @@ function createPlayerObjects(body, position){
   for(var i = 4; i < playerValuesArr.length ; i = i + 4){
       playerValuesArr.splice(i,0);
   }
-  console.log(playerValuesArr);
+  //console.log(playerValuesArr);
 
   // create a new player object for each player and push it to a player array
   const playerArr = [];
@@ -165,7 +193,6 @@ function createPlayerObjects(body, position){
 
     for(var j = (i * 4); j <= (i * 4) + 3; j++){
       storePlayerValues.push(playerValuesArr[j]);
-      //console.log("player value for " + splitPlayerNameArr[1] + ": " + playerValuesArr[j]);
     }
 
     var divisor;
