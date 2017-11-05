@@ -8,7 +8,6 @@ var Player = require('./app/models/player.js');
 
 var app = express();
 
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -16,11 +15,25 @@ var port = process.env.PORT || 8080;
 
 var router = express.Router();
 
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./sa.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://usfl-dynasty-values.firebaseio.com"
+});
+
+var db = admin.firestore();
+
+var qbDocRef = db.collection('values').doc('qb');
+var rbDocRef = db.collection('values').doc('rb');
+var wrDocRef = db.collection('values').doc('wr');
+var teDocRef = db.collection('values').doc('te');
+
 // middleware to use for all requests
 router.use(function(req, res, next) {
-    // do logging
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    // do logging    
     console.log('Middleware is working!.');
     next(); // make sure we go to the next routes and don't stop here
 });
@@ -29,21 +42,49 @@ router.get('/', function(req, res) {
     res.json({ message: 'hooray! welcome to the USFL api!' });
 });
 
-// routes for obtaining player values
+// routes for obtaining player values and saving player values to the DB for Quarter Backs
 router.route('/playervalues/qb')
 .get(function(req, res){
-
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   request('https://www.fantasypros.com/nfl/rankings/dynasty-qb.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
     var qbs = createPlayerObjects(body, "qb");
     res.json(qbs);
   });
+})
+.post(function (req, res) {
+  request('https://www.fantasypros.com/nfl/rankings/dynasty-qb.php', function(error, response, body){
+    console.log('Errors: ' + error);
+    // call out to return from create player objects function
+    var qbs = createPlayerObjects(body, "qb");
+    //save only the top 25 qbs
+    for(var i=0; i<25; i++){
+      console.log(qbs[i]);
+      var set = qbDocRef.set({
+        firstname: qbs[i].FirstName,
+        lastname: qbs[i].LastName,
+        team: qbs[i].Team,
+        best: qbs[i].Best,
+        worst: qbs[i].Worst,
+        avg: qbs[i].Avg,
+        stddev: qbs[i].StdDev,
+        divisor: qbs[i].Divisor,
+        value: qbs[i].Value
+      });
+      res.json(qbs);
+    };
+  });
 });
+
+// obtaining player values and saving player vales to the DB for Running Backs
 
 router.route('/playervalues/rb')
 .get(function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-rb.php', function(error, response, body){
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     console.log('Errors: ' + error);
     // call out to return from create player objects function
     var rbs = createPlayerObjects(body, "rb");
@@ -51,9 +92,13 @@ router.route('/playervalues/rb')
   });
 });
 
+// obtaining player values and saving player vales to the DB for Wide Recievers
+
 router.route('/playervalues/wr')
 .get(function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-wr.php', function(error, response, body){
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     console.log('Errors: ' + error);
     // call out to return from create player objects function
     var wrs = createPlayerObjects(body, "wr");
@@ -61,9 +106,12 @@ router.route('/playervalues/wr')
   });
 });
 
+// obtaining player values and saving player vales to the DB for Tight Ends
+
 router.route('/playervalues/te')
 .get(function(req, res){
-
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   request('https://www.fantasypros.com/nfl/rankings/dynasty-te.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
@@ -72,6 +120,7 @@ router.route('/playervalues/te')
   });
 });
 
+// API Private Functions
 
 function createPlayerObjects(body, position){
 
@@ -97,9 +146,9 @@ function createPlayerObjects(body, position){
   playerValuesArr.splice(0,5);
 
   for(var i = 4; i < playerValuesArr.length ; i = i + 4){
-      playerValuesArr.splice(i,1);
+      playerValuesArr.splice(i,0);
   }
-  //console.log(playerValuesArr);
+  console.log(playerValuesArr);
 
   // create a new player object for each player and push it to a player array
   const playerArr = [];
@@ -116,6 +165,7 @@ function createPlayerObjects(body, position){
 
     for(var j = (i * 4); j <= (i * 4) + 3; j++){
       storePlayerValues.push(playerValuesArr[j]);
+      //console.log("player value for " + splitPlayerNameArr[1] + ": " + playerValuesArr[j]);
     }
 
     var divisor;
