@@ -97,7 +97,7 @@ function createPlayerObjects(body, position){
   playerValuesArr.splice(0,5);
 
   for(var i = 4; i < playerValuesArr.length ; i = i + 4){
-      playerValuesArr.splice(i,1);
+      playerValuesArr.splice(i,0);
   }
   //console.log(playerValuesArr);
 
