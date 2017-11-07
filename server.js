@@ -8,6 +8,12 @@ var Player = require('./app/models/player.js');
 
 var app = express();
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -18,12 +24,6 @@ var router = express.Router();
 var admin = require("firebase-admin");
 
 var serviceAccount = require("./sa.json");
-
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -36,7 +36,9 @@ var db = admin.firestore();
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
-    //console.log('Middleware is working!.');
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    console.log('Middleware is working!.');
     next(); // make sure we go to the next routes and don't stop here
 });
 
