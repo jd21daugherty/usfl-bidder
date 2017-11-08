@@ -27,6 +27,11 @@ admin.initializeApp({
 
 var db = admin.firestore();
 
+var corsOptions = {
+  origin: 'https://birdwell.github.io/fantasy-values/',
+  optionsSuccessStatus: 200
+};
+
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
@@ -34,7 +39,7 @@ router.use(function(req, res, next) {
     next(); // make sure we go to the next routes and don't stop here
 });
 
-router.get('/', cors(), function(req, res) {
+router.get('/', cors(corsOptions), function(req, res) {
     res.json({ message: 'hooray! welcome to the USFL api!' });
 });
 
@@ -80,7 +85,7 @@ router.route('/playervalues/qb')
 // obtaining player values and saving player vales to the DB for Running Backs
 
 router.route('/playervalues/rb')
-.get( cors(), function(req, res){
+.get( cors(corsOptions), function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-rb.php', function(error, response, body){
     //res.header("Access-Control-Allow-Origin", "*");
     //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -120,7 +125,7 @@ router.route('/playervalues/rb')
 // obtaining player values and saving player vales to the DB for Wide Recievers
 
 router.route('/playervalues/wr')
-.get( cors(), function(req, res){
+.get( cors(corsOptions), function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-wr.php', function(error, response, body){
     //res.header("Access-Control-Allow-Origin", "*");
     //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -160,7 +165,7 @@ router.route('/playervalues/wr')
 // obtaining player values and saving player vales to the DB for Tight Ends
 
 router.route('/playervalues/te')
-.get( cors(), function(req, res){
+.get( cors(corsOptions), function(req, res){
   //res.header("Access-Control-Allow-Origin", "*");
   //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   request('https://www.fantasypros.com/nfl/rankings/dynasty-te.php', function(error, response, body){
