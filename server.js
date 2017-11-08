@@ -3,16 +3,11 @@ const express = require('express');
 const cheerio = require('cheerio');
 var bodyParser = require('body-parser');
 var request = require('request');
+var cors = require('cors');
 
 var Player = require('./app/models/player.js');
 
 var app = express();
-
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -32,23 +27,20 @@ admin.initializeApp({
 
 var db = admin.firestore();
 
-
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    console.log('Middleware is working!.');
+
     next(); // make sure we go to the next routes and don't stop here
 });
 
-router.get('/', function(req, res) {
+router.get('/', cors(), function(req, res) {
     res.json({ message: 'hooray! welcome to the USFL api!' });
 });
 
 // routes for obtaining player values and saving player values to the DB for Quarter Backs
 router.route('/playervalues/qb')
-.get(function(req, res){
+.get( cors(), function(req, res){
   //res.header("Access-Control-Allow-Origin", "*");
   //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   request('https://www.fantasypros.com/nfl/rankings/dynasty-qb.php', function(error, response, body){
@@ -88,7 +80,7 @@ router.route('/playervalues/qb')
 // obtaining player values and saving player vales to the DB for Running Backs
 
 router.route('/playervalues/rb')
-.get(function(req, res){
+.get( cors(), function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-rb.php', function(error, response, body){
     //res.header("Access-Control-Allow-Origin", "*");
     //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -128,7 +120,7 @@ router.route('/playervalues/rb')
 // obtaining player values and saving player vales to the DB for Wide Recievers
 
 router.route('/playervalues/wr')
-.get(function(req, res){
+.get( cors(), function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-wr.php', function(error, response, body){
     //res.header("Access-Control-Allow-Origin", "*");
     //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -168,7 +160,7 @@ router.route('/playervalues/wr')
 // obtaining player values and saving player vales to the DB for Tight Ends
 
 router.route('/playervalues/te')
-.get(function(req, res){
+.get( cors(), function(req, res){
   //res.header("Access-Control-Allow-Origin", "*");
   //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   request('https://www.fantasypros.com/nfl/rankings/dynasty-te.php', function(error, response, body){
