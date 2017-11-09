@@ -15,9 +15,6 @@ var port = process.env.PORT || 8080;
 
 var router = express.Router();
 
-//app.use(router);
-//router.use(app.router);
-
 // firebase setup
 
 var admin = require("firebase-admin");
