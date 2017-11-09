@@ -15,7 +15,7 @@ var port = process.env.PORT || 8080;
 
 var router = express.Router();
 
-app.use(router);
+//app.use(router);
 //router.use(app.router);
 
 // firebase setup
@@ -36,6 +36,7 @@ var db = admin.firestore();
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
+    cors();
     next(); // make sure we go to the next routes and don't stop here
 });
 
