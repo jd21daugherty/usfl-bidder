@@ -400,5 +400,5 @@ function getTeDivisor(avgRank){
 // Express App Initialization
 app.use('/api', router);
 
-app.listen(port);
+app.listen(port, "0.0.0.0");
 console.log('Welcome to the USFL API on port: ' + port);
