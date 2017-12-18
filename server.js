@@ -3,11 +3,10 @@ const express = require('express');
 const cheerio = require('cheerio');
 var bodyParser = require('body-parser');
 var request = require('request');
-var cors = require('cors');
 var Player = require('./app/models/player.js');
 
-var app = express();
-app.use(cors());
+//var app = express();
+//var cors = require('cors');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -33,7 +32,8 @@ var db = admin.firestore();
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
-    cors();
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next(); // make sure we go to the next routes and don't stop here
 });
 
