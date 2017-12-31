@@ -3,13 +3,11 @@ const express = require('express');
 const cheerio = require('cheerio');
 var bodyParser = require('body-parser');
 var request = require('request');
-
 var cors = require('cors');
 
 var Player = require('./app/models/player.js');
 
-//var app = express();
-//var cors = require('cors');
+var app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
