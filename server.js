@@ -11,7 +11,8 @@ var app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-var port = process.env.PORT || 8080;
+
+//var port = process.env.PORT || 8080;
 
 var router = express.Router();
 
@@ -398,5 +399,5 @@ function getTeDivisor(avgRank){
 // Express App Initialization
 app.use('/api', router);
 
-app.listen(port, "0.0.0.0");
+app.listen(process.env.PORT || 5000);
 console.log('Welcome to the USFL API on port: ' + port);
