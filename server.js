@@ -11,9 +11,9 @@ var app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use('/api', router);
 
-//var port = process.env.PORT || 8080;
-
+app.listen(process.env.PORT || 5000);
 var router = express.Router();
 
 // firebase setup
@@ -397,7 +397,5 @@ function getTeDivisor(avgRank){
 }
 
 // Express App Initialization
-app.use('/api', router);
 
-app.listen(process.env.PORT || 5000);
 console.log('Welcome to the USFL API on port: ' + port);
