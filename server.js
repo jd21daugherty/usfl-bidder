@@ -3,6 +3,9 @@ const express = require('express');
 const cheerio = require('cheerio');
 var bodyParser = require('body-parser');
 var request = require('request');
+
+var cors = require('cors');
+
 var Player = require('./app/models/player.js');
 
 //var app = express();
@@ -17,7 +20,6 @@ var router = express.Router();
 // firebase setup
 
 var admin = require("firebase-admin");
-
 var serviceAccount = require("./sa.json");
 
 admin.initializeApp({
@@ -27,13 +29,11 @@ admin.initializeApp({
 
 var db = admin.firestore();
 
-// end firebase setup
-
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    console.log('Middleware is working!.');
+    cors();
     next(); // make sure we go to the next routes and don't stop here
 });
 
