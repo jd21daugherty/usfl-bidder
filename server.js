@@ -3,17 +3,21 @@ const express = require('express');
 const cheerio = require('cheerio');
 var bodyParser = require('body-parser');
 var request = require('request');
+
 var cors = require('cors');
+
 var Player = require('./app/models/player.js');
 
-var app = express();
+//var app = express();
+//var cors = require('cors');
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-
 var port = process.env.PORT || 8080;
 
 var router = express.Router();
+
+// firebase setup
 
 var admin = require("firebase-admin");
 var serviceAccount = require("./sa.json");
@@ -84,6 +88,32 @@ router.route('/playervalues/rb')
     var rbs = createPlayerObjects(body, "rb");
     res.json(rbs);
   });
+})
+.post(function (req, res) {
+  request('https://www.fantasypros.com/nfl/rankings/dynasty-rb.php', function(error, response, body){
+    console.log('Errors: ' + error);
+    // call out to return from create player objects function
+    var rbs = createPlayerObjects(body, "rb");  
+    var date = new Date().toJSON().slice(0,10).replace(/-/g,'/');  
+
+    //save only the top 50 rbs
+    for(var i = 0; i < 49; i++){
+      var rbDocRef = db.collection('rb-values').doc(rbs[i].FirstName + " " + rbs[i].LastName);
+      var timevalue = {
+        timestamp: date,
+        value: rbs[i].Value,
+        best: rbs[i].Best,
+        worst: rbs[i].Worst,
+        avg: rbs[i].Avg,
+        stddev: rbs[i].StdDev,
+        divisor: rbs[i].Divisor,    
+      }
+      
+      createOrUpdateDocument(rbDocRef, rbs[i].FirstName, rbs[i].LastName, rbs[i].Team, timevalue);
+
+    };
+    res.json(rbs);
+  });
 });
 
 // obtaining player values and saving player vales to the DB for Wide Recievers
@@ -94,6 +124,32 @@ router.route('/playervalues/wr')
     console.log('Errors: ' + error);
     // call out to return from create player objects function
     var wrs = createPlayerObjects(body, "wr");
+    res.json(wrs);
+  });
+})
+.post(function (req, res) {
+  request('https://www.fantasypros.com/nfl/rankings/dynasty-wr.php', function(error, response, body){
+    console.log('Errors: ' + error);
+    // call out to return from create player objects function
+    var wrs = createPlayerObjects(body, "wr");  
+    var date = new Date().toJSON().slice(0,10).replace(/-/g,'/');  
+
+    //save only the top 75 wrs
+    for(var i = 0; i < 74; i++){
+      var wrDocRef = db.collection('wr-values').doc(wrs[i].FirstName + " " + wrs[i].LastName);
+      var timevalue = {
+        timestamp: date,
+        value: wrs[i].Value,
+        best: wrs[i].Best,
+        worst: wrs[i].Worst,
+        avg: wrs[i].Avg,
+        stddev: wrs[i].StdDev,
+        divisor: wrs[i].Divisor,    
+      }
+      
+      createOrUpdateDocument(wrDocRef, wrs[i].FirstName, wrs[i].LastName, wrs[i].Team, timevalue);
+
+    };
     res.json(wrs);
   });
 });
@@ -108,26 +164,52 @@ router.route('/playervalues/te')
     var tes = createPlayerObjects(body, "te");
     res.json(tes);
   });
+})
+.post(function (req, res) {
+  request('https://www.fantasypros.com/nfl/rankings/dynasty-te.php', function(error, response, body){
+    console.log('Errors: ' + error);
+    // call out to return from create player objects function
+    var tes = createPlayerObjects(body, "te");  
+    var date = new Date().toJSON().slice(0,10).replace(/-/g,'/');  
+
+    //save only the top 25 tes
+    for(var i = 0; i < 24; i++){
+      var teDocRef = db.collection('te-values').doc(tes[i].FirstName + " " + tes[i].LastName);
+      var timevalue = {
+        timestamp: date,
+        value: tes[i].Value,
+        best: tes[i].Best,
+        worst: tes[i].Worst,
+        avg: tes[i].Avg,
+        stddev: tes[i].StdDev,
+        divisor: tes[i].Divisor,    
+      }
+      
+      createOrUpdateDocument(teDocRef, tes[i].FirstName, tes[i].LastName, tes[i].Team, timevalue);
+
+    };
+    res.json(tes);
+  });
 });
 
 // API Private Functions
 
-function createOrUpdateDocument(docRef, playerfirstname, playerlastname, team, timevalue) {
-  var getDoc = docRef.get()
+async function createOrUpdateDocument(docRef, playerfirstname, playerlastname, team, timevalue) {
+  var getDoc = await docRef.get()
   .then(doc => {
       if (!doc.exists) {
-          console.log('Creating document for : ' + playerfirstname + " " + playerlastname );
-          qbDocRef.set({
+          //console.log('Creating document for : ' + playerfirstname + " " + playerlastname );
+          docRef.set({
             firstname: playerfirstname,
             lastname: playerlastname,
             team: team,
             values: [timevalue]
           });
       } else {
-          console.log('Updating document for :' + playerfirstname + " " + playerlastname);
-          var newValueArr = Object.assign({}, doc.data().values)
+          //console.log('Updating document for :' + playerfirstname + " " + playerlastname);
+          var newValueArr = doc.data().values;
           newValueArr.push(timevalue);
-          qbDocRef.update({
+          docRef.update({
             values: newValueArr
           });
       }
@@ -318,5 +400,5 @@ function getTeDivisor(avgRank){
 // Express App Initialization
 app.use('/api', router);
 
-app.listen(port);
+app.listen(port, "0.0.0.0");
 console.log('Welcome to the USFL API on port: ' + port);
