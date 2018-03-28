@@ -4,7 +4,7 @@
   "description": "online bidder API for dynasty fantasy football league",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "author": "Joshua Daugherty",
   "license": "ISC",
@@ -13,8 +13,8 @@
     "cheerio": "^1.0.0-rc.1",
     "cors": "^2.8.4",
     "express": "^4.15.3",
-    "firebase": "^4.6.1",
-    "firebase-admin": "^5.4.3",
+    "firebase": "^4.8.1",
+    "firebase-admin": "^5.6.0",
     "request": "^2.81.0"
   }
 }

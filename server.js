@@ -9,15 +9,15 @@ var Player = require('./app/models/player.js');
 
 var app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-
-var port = process.env.PORT || 8080;
-
+app.listen(process.env.PORT || 5000);
 var router = express.Router();
+app.use('/api', router);
+
+// firebase setup
 
 var admin = require("firebase-admin");
-
 var serviceAccount = require("./sa.json");
 
 admin.initializeApp({
@@ -27,27 +27,21 @@ admin.initializeApp({
 
 var db = admin.firestore();
 
-var corsOptions = {
-  origin: 'https://birdwell.github.io/fantasy-values/',
-  optionsSuccessStatus: 200
-};
-
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
-
+    console.log('Middleware is working!.');
+    cors();
     next(); // make sure we go to the next routes and don't stop here
 });
 
-router.get('/', cors(corsOptions), function(req, res) {
+router.get('/', function(req, res) {
     res.json({ message: 'hooray! welcome to the USFL api!' });
 });
 
 // routes for obtaining player values and saving player values to the DB for Quarter Backs
 router.route('/playervalues/qb')
-.get( cors(), function(req, res){
-  //res.header("Access-Control-Allow-Origin", "*");
-  //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+.get(function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-qb.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
@@ -85,10 +79,8 @@ router.route('/playervalues/qb')
 // obtaining player values and saving player vales to the DB for Running Backs
 
 router.route('/playervalues/rb')
-.get( cors(corsOptions), function(req, res){
+.get(function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-rb.php', function(error, response, body){
-    //res.header("Access-Control-Allow-Origin", "*");
-    //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     console.log('Errors: ' + error);
     // call out to return from create player objects function
     var rbs = createPlayerObjects(body, "rb");
@@ -125,10 +117,8 @@ router.route('/playervalues/rb')
 // obtaining player values and saving player vales to the DB for Wide Recievers
 
 router.route('/playervalues/wr')
-.get( cors(corsOptions), function(req, res){
+.get(function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-wr.php', function(error, response, body){
-    //res.header("Access-Control-Allow-Origin", "*");
-    //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     console.log('Errors: ' + error);
     // call out to return from create player objects function
     var wrs = createPlayerObjects(body, "wr");
@@ -165,9 +155,7 @@ router.route('/playervalues/wr')
 // obtaining player values and saving player vales to the DB for Tight Ends
 
 router.route('/playervalues/te')
-.get( cors(corsOptions), function(req, res){
-  //res.header("Access-Control-Allow-Origin", "*");
-  //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+.get(function(req, res){
   request('https://www.fantasypros.com/nfl/rankings/dynasty-te.php', function(error, response, body){
     console.log('Errors: ' + error);
     // call out to return from create player objects function
@@ -293,8 +281,8 @@ function createPlayerObjects(body, position){
 
 
     var firstName = splitPlayerNameArr[0];
-    var lastName = splitPlayerNameArr[1];
-    var team = splitPlayerNameArr[2];
+    var lastName = splitPlayerNameArr[2];
+    var team = splitPlayerNameArr[3];
 
     var bestRank = storePlayerValues[0];
     var worstRank = storePlayerValues[1];
@@ -408,7 +396,5 @@ function getTeDivisor(avgRank){
 }
 
 // Express App Initialization
-app.use('/api', router);
 
-app.listen(port);
-console.log('Welcome to the USFL API on port: ' + port);
+console.log('Welcome to the USFL API on port: 5000');
