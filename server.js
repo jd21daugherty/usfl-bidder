@@ -281,8 +281,8 @@ function createPlayerObjects(body, position){
 
 
     var firstName = splitPlayerNameArr[0];
-    var lastName = splitPlayerNameArr[1];
-    var team = splitPlayerNameArr[2];
+    var lastName = splitPlayerNameArr[2];
+    var team = splitPlayerNameArr[3];
 
     var bestRank = storePlayerValues[0];
     var worstRank = storePlayerValues[1];
