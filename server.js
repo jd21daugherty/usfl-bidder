@@ -13,6 +13,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.listen(process.env.PORT || 5000);
 var router = express.Router();
+
+var corsOptions = {
+  origin: 'https://birdwell.github.io',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+app.use(cors(corsOptions));
+
 app.use('/api', router);
 
 // firebase setup
@@ -27,16 +35,10 @@ admin.initializeApp({
 
 var db = admin.firestore();
 
-var corsOptions = {
-  origin: 'https://birdwell.github.io',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
-
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
     console.log('Middleware is working!.');
-    cors(corsOptions);
     next(); // make sure we go to the next routes and don't stop here
 });
 
