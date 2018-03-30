@@ -1,5 +1,5 @@
 const cheerio = require('cheerio');
-
+var Player = require('../models/player');
 var getQbDivisor = require('./calculateDivisors/getQbDivisor');
 var getRbDivisor = require('./calculateDivisors/getRbDivisor');
 var getWrDivisor = require('./calculateDivisors/getWrDivisor');
