@@ -1,4 +1,4 @@
-{
+var sa = {
     "type": "service_account",
     "project_id": "usfl-dynasty-values",
     "private_key_id": "54f1aa9bba7567b43717bfb867bd4812655a32e1",
@@ -11,3 +11,4 @@
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-evvxm%40usfl-dynasty-values.iam.gserviceaccount.com"
   }
   
+  module.exports = sa;
