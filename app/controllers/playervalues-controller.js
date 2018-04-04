@@ -6,6 +6,8 @@ var router = express.Router();
 var createPlayerObjects = require('../functions/createPlayerObjects');
 var createOrUpdateDocument = require('../functions/createOrUpdateDocument');
 
+var db = require('../config/firebaseconfig');
+
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging    
