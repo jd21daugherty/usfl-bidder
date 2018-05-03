@@ -1,5 +1,5 @@
-var graphqlConfigObject = require('../config/graphcool-config');
-var graphqlEndpoint = graphqlConfigObject.url;
+
+var graphcoolClient = require('../config/graphcool-config');
 const { request } = require('graphql-request');
 
 var addToPlayerPlayerValue = require('../graphql-queries/addToPlayerPlayerValue');
@@ -12,7 +12,7 @@ const connectPlayerValueAndPlayerByIds = async (playerId, playerValueId) => {
 
       var connectedValueAndPlayerInformation;
 
-      await request(graphqlEndpoint, addToPlayerPlayerValue, connectPlayerAndPlayerValueVariables).then(data => {
+      await graphcoolClient.request(addToPlayerPlayerValue, connectPlayerAndPlayerValueVariables).then(data => {
         connectedValueAndPlayerInformation = data.addToPlayerValueOnPlayer;
       });
 
