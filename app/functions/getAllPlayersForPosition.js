@@ -7,6 +7,7 @@ var getPlayerDataQuery = require('../graphql-queries/getPlayerDataQuery');
 const getAllPlayersForPosition = async (positionVariableObject) => {
     var allPlayers = [];
     await graphcoolClient.request(getPlayerDataQuery, positionVariableObject).then(players => {
+        //console.log(players.allPlayers);
         allPlayers = players.allPlayers;
     });
     return allPlayers
