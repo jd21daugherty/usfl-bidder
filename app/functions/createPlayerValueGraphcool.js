@@ -71,9 +71,8 @@ const createPlayerValueGraphcool = async (playersArr, position, numberOfPlayersT
 
            if(playerTeamFromFantasyPros != playerTeamFromGraphcool){
              // this means that the player was traded or changed teams, update the team
-
+            
            }
-           else{
              // no changes and a matching player, just save the player value
              var bestIntConverted = parseInt(playersArr[i].Best);
              var worstIntConverted = parseInt(playersArr[i].Worst);
@@ -91,7 +90,7 @@ const createPlayerValueGraphcool = async (playersArr, position, numberOfPlayersT
 
               var createdPlayerValueId = await createPlayerValue(createPlayerValueVariables);
               connectPlayerValueAndPlayerByIds(matchingPlayerArr[0].id, createdPlayerValueId);
-          }          
+                  
           //console.log("Matching record for " + playerFullName);
         }
         else if(matchingPlayerArr.length > 1){

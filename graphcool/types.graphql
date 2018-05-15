@@ -1,0 +1,99 @@
+
+type FreeAgentBid @model {
+  id: ID! @isUnique
+  freeAgentStatusLink: FreeAgentStatus! @relation(name: "FreeAgentBids")
+  updatedAt: DateTime!
+  bid: Int!
+  length: Int!
+  weightedBid: Int!
+  team: Team! @relation(name: "TeamFreeAgentBid")
+}
+
+type FreeAgentStatus @model {
+  id: ID! @isUnique
+  player: Player @relation(name: "PlayerFreeAgentStatus")
+  type: FreeAgentType
+  bids: [FreeAgentBid!]! @relation(name: "FreeAgentBids")
+}
+
+type Player @model {
+  id: ID! @isUnique
+  position: String!
+  firstName: String!
+  lastName: String!
+  realTeam: String
+  updatedAt: DateTime!
+  signedStatus: Boolean!
+  playerValues: [PlayerValue!]! @relation(name: "PlayerValueOnPlayer")
+  contract: Contract @relation(name: "PlayerContract")
+  freeAgentStatus: FreeAgentStatus @relation(name: "PlayerFreeAgentStatus")
+}
+
+type PlayerValue @model {
+  id: ID! @isUnique
+  player: Player @relation(name: "PlayerValueOnPlayer")
+  average: Float!
+  best: Int!
+  divisor: Float!
+  stdandardDeviation: Float!
+  createdAt: DateTime!
+  value: Int!
+  worst: Int!
+}
+
+type Contract @model {
+  createdAt: DateTime!
+  id: ID! @isUnique
+  updatedAt: DateTime!
+  player: Player! @relation(name: "PlayerContract")
+  signedValue: Int!
+  length: Int!
+  team: Team! @relation(name: "TeamContract")
+}
+
+type Team @model {
+  id: ID! @isUnique
+  owner: Owner! @relation(name: "TeamOwner")
+  league: League! @relation(name: "TeamLeague")
+  name: String!
+  nickname: String!
+  contracts: [Contract!]! @relation(name: "TeamContract")
+  freeAgentBids: [FreeAgentBid!]! @relation(name: "TeamFreeAgentBid")
+}
+
+type Owner @model {
+  id: ID! @isUnique
+  name: String!
+  emailAddress: String!
+  league: League @relation(name: "LeagueOwner")
+  team: Team @relation(name: "TeamOwner")
+}
+
+type League @model {
+  id: ID! @isUnique
+  name: String!
+  owners: [Owner!]! @relation(name: "LeagueOwner")
+  teams: [Team!]! @relation(name: "TeamLeague")
+}
+
+type File @model {
+  contentType: String!
+  createdAt: DateTime!
+  id: ID! @isUnique
+  name: String!
+  secret: String! @isUnique
+  size: Int!
+  updatedAt: DateTime!
+  url: String! @isUnique
+}
+
+type User @model {
+  createdAt: DateTime!
+  id: ID! @isUnique
+  updatedAt: DateTime!
+}
+
+enum FreeAgentType {
+  Restricted
+  Unrestricted
+}
