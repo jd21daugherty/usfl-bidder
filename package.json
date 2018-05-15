@@ -1,5 +1,9 @@
 {
   "name": "usfl-bidder",
   "version": "1.0.0",
-  "description": "My Graphcool Service"
+  "description": "My Graphcool Service",
+  "dependencies": {
+    "express": "^4.16.3",
+    "request": "^2.85.0"
+  }
 }
